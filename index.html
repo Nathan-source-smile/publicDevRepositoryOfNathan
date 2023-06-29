@@ -3,10 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Phaser Game</title>
-    <script src="node_modules/phaser/dist/phaser.min.js"></script>
+    <!-- <script src="node_modules/phaser/dist/phaser.min.js"></script> -->
+    <script src="phaser.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Inter';
+            src: url('assets/fonts/Inter/Inter-VariableFont_slnt,wght.ttf?v=1') format('truetype');
+        }
+        @font-face {
+            font-family: 'DM Sans';
+            src: url('assets/fonts/DM_Sans/DMSans-Regular.ttf') format('woff');
+        }
+
+        .fontload{
+          visibility: hidden;
+          position: absolute;
+        }
+    </style>
 </head>
 <body>
     <!-- Your game content goes here -->
+    <div class="fontload" style="font-family:'Inter'; font-size: 50px;">spin</div>
+    <div class="fontload" style="font-family:'DM Sans'; font-size: 50px;">spin</div>
     <script src="game.js"></script>
 </body>
 </html>

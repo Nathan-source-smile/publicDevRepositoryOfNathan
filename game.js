@@ -1,60 +1,60 @@
-import WebFont from 'webfontloader';
+// import WebFont from 'webfontloader';
 
 const GAME_WIDTH = 1440;
 const GAME_HEIGHT = 1366;
 let arr = [0.001, 2, 20, 5, 0.05, 20, 50, 0.1, 6];
 let arr_cong = [
     {
-        text: "GREAT JOB!", 
+        text: "GREAT JOB!",
         value: "0.001",
         icon: "eth",
         percent: 0.088,
         board: 'luckybonuseth',
     },
     {
-        text: "CONGRATULATIONS!", 
+        text: "CONGRATULATIONS!",
         value: "",
         icon: "trx",
         percent: 0.2,
         board: 'luckybonustrx',
     },
     {
-        text: "MUCH WOW!", 
+        text: "MUCH WOW!",
         value: "",
         icon: "doge",
         percent: 0.208,
         board: 'luckybonusdoge',
     },
     {
-        text: "KEEP UP THE GOOD LUCK!", 
+        text: "KEEP UP THE GOOD LUCK!",
         value: "",
         icon: "usdt",
         percent: 0.104,
         board: 'luckybonususdt',
     },
     {
-        text: "CONGRATULATIONS!", 
+        text: "CONGRATULATIONS!",
         value: "",
         icon: "bnb",
         percent: 0.056,
         board: 'luckybonusbnb',
     },
     {
-        text: "WELL DONE!", 
+        text: "WELL DONE!",
         value: "",
         icon: "usdc",
         percent: 0.056,
         board: 'luckybonususdc',
     },
     {
-        text: "WELL DONE!", 
+        text: "WELL DONE!",
         value: "",
         icon: "rake",
         percent: 0.2,
         board: 'luckybonusrake',
     },
     {
-        text: "WELL DONE!", 
+        text: "WELL DONE!",
         value: "",
         icon: "ltc",
         percent: 0.088,
@@ -68,37 +68,38 @@ let arr_cong = [
         board: 'luckybonusbtc',
     },
 ];
-let config={
-    type:Phaser.AUTO,
+let config = {
+    type: Phaser.AUTO,
     parent: 'game-container',
-    width:GAME_WIDTH,
-    height:GAME_WIDTH,
-    backgroundColor:0x04141E,
-    
+    width: GAME_WIDTH,
+    height: GAME_WIDTH,
+    backgroundColor: 0x04141E,
+
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
 
-    scene:{
-        preload:preload,
-        create : create,
-        update:update,
+    scene: {
+        preload: preload,
+        create: create,
+        update: update,
     },
     plugins: {
         global: [{
-          key: 'WebFontLoader',
-          plugin: window.WebFontLoader,
-          start: true
+            key: 'WebFontLoader',
+            plugin: window.WebFontLoader,
+            start: true
         }]
     }
-    
+
 };
 
-let game =new Phaser.Game(config);
+let game = new Phaser.Game(config);
 const { width, height } = game.config;
 
-let music ;
+let music;
+let backsound;
 let counter = 0;
 let pop;
 let rounds;
@@ -124,7 +125,7 @@ let spinwin;
 let standart;
 let emitter;
 
-function preload(){
+function preload() {
     console.log("Preload");
     const images = [
         'background',
@@ -183,51 +184,41 @@ function preload(){
         'luckybonusdoge',
         'luckybonusbtc',
         'luckybonusbnb',
-      ];
+        'glitter',
+    ];
     images.forEach((image) => {
-    this.load.image(image, `assets/img/${image}.png`);
+        this.load.image(image, `assets/img/${image}.png`);
     });
-    this.load.spritesheet('particles', 'assets/img/flower.png', {frameWidth: 100, frameHeight: 100});
+    this.load.spritesheet('particles', 'assets/img/flower.png', { frameWidth: 100, frameHeight: 100 });
     this.load.spritesheet('lottery', 'assets/img/flower.png', { frameWidth: 100, frameHeight: 100 });
     this.load.spritesheet("plane", "assets/img/plane.png", { frameWidth: 512, frameHeight: 512 });
+    this.load.spritesheet("shiningStar", "assets/img/twinklingstar.png", { frameWidth: 738, frameHeight: 738 });
 
-    this.load.audio('audio1', ['spina.mp3']);
-    this.load.audio('pop', ['pop.mp3']);
-    WebFont.load({
-        google: {
-            families: ['Inter']
-        },
-        active: () => {
-            // Font is loaded and ready to use
-            aaa=this.add.text(100, 100, 'Hello Phaser', { fontFamily: 'Your Font Family', fontSize: '32px', color: '#ffffff' });
-            aaa.setDepth(10);
-        }
-    });
+    this.load.audio('buttonsound', ['assets/AudioClips/playStart.wav']);
+    this.load.audio('pop', ['assets/AudioClips/spinWin.wav']);
+    this.load.audio('backsound', ['assets/AudioClips/03_Spinning_Wheel_Music_LOOP.wav']);
+    // WebFont.load({
+    //     google: {
+    //         families: ['Inter']
+    //     },
+    //     active: () => {
+    //         // Font is loaded and ready to use
+    //         aaa = this.add.text(100, 100, 'Hello Phaser', { fontFamily: 'Your Font Family', fontSize: '32px', color: '#ffffff' });
+    //         aaa.setDepth(10);
+    //     }
+    // });
 
 };
 
-function create(){
+function create() {
     console.log("Create");
     const title = this.add.sprite(width / 2, 72, 'title');
     const background = this.add.sprite(width / 2, 400, 'background');
     background.setScale(1);
-  
-    // Create a sprite for the lottery
-    // var lottery = this.add.sprite(400, 300, 'lottery');
-
-    // // Add the blinking animation
-    // this.anims.create({
-    //     key: 'lottery',
-    //     frames: this.anims.generateFrameNumbers('lottery', { start: 1, end: 4 }),
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
-
-    // lottery.anims.play('blink');
 
     // create a new rectangle shape with border-radius, stroke, and alpha
     const total_rect = this.add.graphics();
-    total_rect.setPosition(width/2-242, 188);
+    total_rect.setPosition(width / 2 - 242, 188);
     // total_rect.setOrigin(0.5);
     total_rect.fillStyle('0x072537');
     total_rect.fillRoundedRect(0, 0, 484, 70, 10);
@@ -236,31 +227,31 @@ function create(){
     const total_spin = this.add.sprite(-190, 0, 'total_spin');
     this.totalScore_text = this.add.text(230, 0, `$337,095,568.67`, {
         font: 'bold 32px Inter'
-      });
+    });
     // this.load.font('Inter', 'assets/fonts/Inter/Inter-VariableFont_slnt,wght.ttf');
     this.totalScore_text.setStyle({
-      color: '#0099F4',
-      textAlign: 'center',
-      fontWeight: 'bold',
-    //   lineHeight: '24px',
-    //   backgroundColor: '#ff00ff',
-      align: 'right',
-      textTransform: 'uppercase'
+        color: '#0099F4',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        //   lineHeight: '24px',
+        //   backgroundColor: '#ff00ff',
+        align: 'right',
+        textTransform: 'uppercase'
     });
     this.totalScore_text.setOrigin(1, 0.5);
     totalScore_panel.add(total_spin);
     totalScore_panel.add(this.totalScore_text);
-  
+
     const ellipse = this.add.sprite(width / 2, 470, 'ellipse');
     ellipse.setScale(1);
-  
+
     const panel_container = this.add.container(width / 2, height / 2);
     panel_container.setSize(520, 525);
-  
+
     const base = this.add.sprite(0, -220, 'base');
     base.setScale(1);
     panel_container.add(base);
-  
+
     this.wheel_container = this.add.container(width / 2, 462);
     const wheel = this.add.sprite(0, 0, 'wheel');
     wheel.setDisplaySize(470, 470);
@@ -273,15 +264,15 @@ function create(){
     this.wheel_container.add(coins);
 
     lights.alpha = 0.2;
-    this.tweens.add({ 
+    this.tweens.add({
         targets: lights,
         alpha: 1, // Target alpha values
         duration: 200, // Duration of the animation in milliseconds
         ease: 'Linear', // Easing function
         yoyo: true, // Play the animation in reverse after reaching the target alpha
         repeat: -1, // Repeat the animation indefinitely
-      });
-  
+    });
+
     this.try_luck = this.add.image(width / 2, 460, 'button');
     this.try_luck.setScale(1);
     // this.try_luck.setDepth(10);
@@ -292,22 +283,22 @@ function create(){
     const pin = this.add.sprite(width / 2, 304, 'pin');
     pin.setScale(1);
 
-    const spinwin=this.add.sprite(width/2, 700,'spinwin');
+    const spinwin = this.add.sprite(width / 2, 700, 'spinwin');
     spinwin.setScale(1);
-    
-    const shineRound=this.add.sprite(width/2-150, 700,'shineRound');
+
+    const shineRound = this.add.sprite(width / 2 - 150, 700, 'shineRound');
     shineRound.setScale(1);
 
-    const shineRound1=this.add.sprite(width/2, 700,'shineRound');
+    const shineRound1 = this.add.sprite(width / 2, 700, 'shineRound');
     shineRound1.setScale(1);
 
-    shineRound.alpha=0;
-    shineRound1.alpha=1;
+    shineRound.alpha = 0;
+    shineRound1.alpha = 1;
     this.half1 = this.tweens.add({
         targets: shineRound1,
-        x: width/2 + 150, // End position off-screen to the right
+        x: width / 2 + 150, // End position off-screen to the right
         alpha: 0,
-        duration: 2000, // Duration of the animation in milliseconds
+        duration: 4000, // Duration of the animation in milliseconds
         ease: 'Quadratic.InOut', // Easing function
         repeat: -1, // Repeat the animation indefinitely
         //yoyo: true,
@@ -317,18 +308,17 @@ function create(){
     this.flowTrigger = false;
     const half = this.tweens.add({
         targets: shineRound,
-        x: width/2, // End position off-screen to the right
+        x: width / 2, // End position off-screen to the right
         alpha: 1,
-        duration: 2000, // Duration of the animation in milliseconds
+        duration: 4000, // Duration of the animation in milliseconds
         ease: 'Quadratic.InOut', // Easing function
         repeat: -1, // Repeat the animation indefinitely
         //yoyo: true,
     });
-    
 
-    this.standart=this.add.sprite(width/2, 790,'standart').setInteractive();
+    this.standart = this.add.sprite(width / 2, 790, 'standart').setInteractive();
     this.standart.setScale(1);
-    
+
     this.scaleTrigger = false;
     this.letter.on('pointerup', spinwheel, this);
     this.standart.on('pointerup', spinwheel, this);
@@ -345,10 +335,10 @@ function create(){
 
     this.letter.on('pointerout', function () {
         // Reverse the scaling animation when the mouse leaves the canvas
-        if (this.scaleTrigger){
+        if (this.scaleTrigger) {
             return;
         }
-        else{
+        else {
             this.tweens.add({
                 targets: [this.letter, this.try_luck],
                 scaleX: 1, // The initial scale on the x-axis
@@ -372,10 +362,10 @@ function create(){
     //
     //set footer
     const game_icon = this.add.sprite(350, 920, 'game');
-    this.game_text = this.add.text(400, 920, `More than 5000+ online slot games`,{
+    this.game_text = this.add.text(400, 920, `More than 5000+ online slot games`, {
         wordWrap: { width: 150, useAdvancedWrap: true },
         font: 'DM Sans'
-      });
+    });
     this.game_text.setStyle({
         color: '#E6E6E6',
         fontSize: '16px',
@@ -385,12 +375,12 @@ function create(){
         align: 'left'
     });
     this.game_text.setOrigin(0, 0.5);
-    
+
     const betting_icon = this.add.sprite(620, 920, 'betting');
-    this.betting_text = this.add.text(670, 920, `Seamless sports betting experience`,{
+    this.betting_text = this.add.text(670, 920, `Seamless sports betting experience`, {
         wordWrap: { width: 150, useAdvancedWrap: true },
         font: 'DM Sans'
-      });
+    });
     this.betting_text.setStyle({
         color: '#E6E6E6',
         fontSize: '16px',
@@ -401,10 +391,10 @@ function create(){
     });
     this.betting_text.setOrigin(0, 0.5);
     const customer_icon = this.add.sprite(890, 920, 'customer');
-    this.customer_text = this.add.text(940, 920, `24/7 live chat for customer support`,{
+    this.customer_text = this.add.text(940, 920, `24/7 live chat for customer support`, {
         wordWrap: { width: 150, useAdvancedWrap: true },
         font: 'DM Sans'
-      });
+    });
     this.customer_text.setStyle({
         color: '#E6E6E6',
         fontSize: '16px',
@@ -416,15 +406,15 @@ function create(){
     this.customer_text.setOrigin(0, 0.5);
 
     const bottom_rect = this.add.graphics();
-    bottom_rect.setPosition(width/2-400, 1040);
+    bottom_rect.setPosition(width / 2 - 400, 1040);
     // bottom_rect.setOrigin(0.5);
     bottom_rect.fillStyle('0x072537');
     bottom_rect.fillRoundedRect(0, 0, 800, 205, 10);
     this.add.existing(bottom_rect);
-    this.bottomTitle_text = this.add.text(width/2, 1087, `Our Payment`,{
+    this.bottomTitle_text = this.add.text(width / 2, 1087, `Our Payment`, {
         // wordWrap: { width: 150, useAdvancedWrap: true },
         font: 'DM Sans'
-      });
+    });
     this.bottomTitle_text.setStyle({
         color: '#E6E6E6',
         fontSize: '32px',
@@ -434,10 +424,10 @@ function create(){
         align: 'center',
     });
     this.bottomTitle_text.setOrigin(0.5, 0.5);
-    this.bottomExp_text = this.add.text(width/2, 1120, `Purchase crypto with our accepted payment methods`,{
+    this.bottomExp_text = this.add.text(width / 2, 1120, `Purchase crypto with our accepted payment methods`, {
         // wordWrap: { width: 150, useAdvancedWrap: true },
         font: 'DM Sans'
-      });
+    });
     this.bottomExp_text.setStyle({
         color: '#E6E6E6',
         fontSize: '14px',
@@ -451,11 +441,11 @@ function create(){
 
     this.tm_icon = this.add.sprite(380, 1180, 'tm_icon');
     this.tm_icon.setOrigin(0.5, 0.5);
-    this.visa_icon = this.add.sprite(width/2-160, 1180, 'visa_icon');
+    this.visa_icon = this.add.sprite(width / 2 - 160, 1180, 'visa_icon');
     this.visa_icon.setOrigin(0.5, 0.5);
-    this.apple_icon = this.add.sprite(width/2, 1180, 'apple_icon');
+    this.apple_icon = this.add.sprite(width / 2, 1180, 'apple_icon');
     this.apple_icon.setOrigin(0.5, 0.5);
-    this.google_icon = this.add.sprite(width/2+160, 1180, 'google_icon');
+    this.google_icon = this.add.sprite(width / 2 + 160, 1180, 'google_icon');
     this.google_icon.setOrigin(0.5, 0.5);
     this.samsung_icon = this.add.sprite(1040, 1180, 'samsung_icon');
     this.samsung_icon.setOrigin(0.5, 0.5);
@@ -465,10 +455,10 @@ function create(){
     this.modalBackground.setAlpha(0.5);
     this.modalBackground.setInteractive();
 
-    this.modalBackground.visible=false;
+    this.modalBackground.visible = false;
 
     //set modal
-    this.modal = this.add.container(width/2, height/2 - 300);
+    this.modal = this.add.container(width / 2, height / 2 - 300);
     this.modal.setSize(617, 516);
 
     const modal_rect = this.add.graphics();
@@ -493,13 +483,13 @@ function create(){
 
     this.cong_text = this.add.text(0, -340, "");
     this.cong_text.setStyle({
-      fontSize: '32px',
-      fontFamily: 'Gilroy',
-      color: '#F5F5F5',
-      fontWeight: '600',
-      lineHeight: '100%',
-      letterSpacing: '-1.28px',
-      align: 'center'
+        fontSize: '32px',
+        fontFamily: 'Gilroy',
+        color: '#F5F5F5',
+        fontWeight: '600',
+        lineHeight: '100%',
+        letterSpacing: '-1.28px',
+        align: 'center'
     });
 
     this.cong_text.setOrigin(0.5, 0);
@@ -516,79 +506,116 @@ function create(){
     this.modal.add(this.signup);
     // Phaser.Display.Align.In.Center(this.modal, this.add.zone(0, 0, game.config.width, game.config.height));
     this.modal.setScale(0.3);
-    this.modal.visible=false;
+    this.modal.visible = false;
 
     let particleConfig = {
-        x: width/2,
+        x: width / 2,
         y: 300,
         key: 'particleKey', // key to use when creating the particle emitter
         frame: { frames: [0, 1, 2, 3], cycle: true }, // frames to use for the particles
         lifespan: 2000, // lifespan of the particles in milliseconds
         speed: { min: 0, max: 800 },
         angle: { min: 0, max: 360 },
-        scale: { start: 0.2, end: .5 },
+        scale: { start: 0.2, end: 0.3 },
         gravityY: 1000, // gravity applied to the particles
         // quantity: 10, // number of particles emitted per second
         // frequency: 100, // time between particle emissions in milliseconds
-        alpha: { start: 1, end: 1}, // alpha of the particles over their lifespan
-        blendMode: 'ADD', // blending mode of the particles
-        // tint: 0xff0000 // tint color of the particles
+        // alpha: { start: 1, end: 1 }, // alpha of the particles over their lifespan
+        blendMode: 'NORMAL', // blending mode of the particles
+        tint: 0xffffff // tint color of the particles
     };
 
     this.anims.create({
-        key: "fly",
-        frameRate: 7,
-        frames: this.anims.generateFrameNumbers("plane", { start: 3, end: 5 }),
+        key: "shine",
+        frameRate: 200,
+        frames: this.anims.generateFrameNumbers("shiningStar", { start: 0, end: 9 }),
         repeat: -1
     });
 
     this.anims.create({
         key: "explode",
         frameRate: 7,
-        frames: this.anims.generateFrameNumbers("plane", { start: 0, end: 2 }),
+        frames: this.anims.generateFrameNumbers("shiningStar", { start: 0, end: 2 }),
         repeat: 2
     });
+    // plane = this.add.sprite(640, 360, "shiningStar");
+    // plane.play("shine");
+    // glitter = this.add.sprite(200, 200, 'glitter');
+    // this.tweens.add({
+    //     targets: shineRound1,
+    //     x: width / 2 + 150, // End position off-screen to the right
+    //     alpha: 0,
+    //     duration: 4000, // Duration of the animation in milliseconds
+    //     ease: 'Quadratic.InOut', // Easing function
+    //     repeat: -1, // Repeat the animation indefinitely
+    //     //yoyo: true,
+    //     // delay: 2000,
+    // });
+    /*emitter = this.add.particles('glitter').createEmitter({
+        x: (100, 200),
+        y: (100, 200),
+        // key: 'particleKey', // key to use when creating the particle emitter
+        // frame: { frames: [0, 1, 2, 3], cycle: true }, // frames to use for the particles
+        lifespan: 2000, // lifespan of the particles in milliseconds
+        speed: { min: 0, max: 0 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.2, end: 0.3 },
+        // gravityY: 0, // gravity applied to the particles
+        // quantity: 10, // number of particles emitted per second
+        // frequency: 100, // time between particle emissions in milliseconds
+        alpha: { start: 0, end: 1 }, // alpha of the particles over their lifespan
+        blendMode: 'NORMAL', // blending mode of the particles
+        tint: 0xffffff // tint color of the particles
+    });*/
+    //emitter.area = new Rectangle(200, 200, 300, 300);
+    //emitter.start(false, 100, 100);
 
+    console.log(Phaser.VERSION);
+    // Create a particle emitter manager
+    const particleManager = this.add.particles('particles');
     emitter = this.add.particles('particles').createEmitter(particleConfig);
     emitter.stop();
 
-    music = this.sound.add('audio1');
+    music = this.sound.add('buttonsound');
     pop = this.sound.add('pop');
-    
+    backsound = this.sound.add('backsound');
+    backsound.autoPlay = true;
+    backsound.play();
+
 }
 let showValue;
 let board;
-function spinwheel(){
+function spinwheel() {
     // Disable the spin button
     this.letter.disableInteractive();
     this.standart.disableInteractive();
 
-    this.scaleTrigger=true;
+    this.scaleTrigger = true;
     this.rotation.stop();
 
     music.play();
-    let rounds = Phaser.Math.Between(3,5);
+    let rounds = Phaser.Math.Between(3, 5);
     let rand = Math.random();
-    let sum=0.0;
-    let index=0;
-    for (let i=0; i<9; i++){
-        sum+=arr_cong[i].percent;
-        if(sum>rand){
+    let sum = 0.0;
+    let index = 0;
+    for (let i = 0; i < 9; i++) {
+        sum += arr_cong[i].percent;
+        if (sum > rand) {
             index = i;
             break;
         }
     }
-    var degree=index*40;
-    total=rounds*360+degree;
+    var degree = index * 40;
+    total = rounds * 360 + degree;
     console.log(rand, index, total)
     tween = this.tweens.add({
-        targets:this.wheel_container,
-        angle:-total,
-        ease:"Cubic.easeInOut",
-        duration:6000,
-        callbackScope:this,
-        onComplete:function(){
-            this.modal.visible=true;
+        targets: this.wheel_container,
+        angle: -total - 20,
+        ease: "Cubic.easeInOut",
+        duration: 6000,
+        callbackScope: this,
+        onComplete: function () {
+            this.modal.visible = true;
             this.tweens.add({
                 targets: this.modal,
                 scaleX: 1,
@@ -613,21 +640,26 @@ function spinwheel(){
             // this.totalScore_text.setText('$'+ counter);
             // this.add.text(w/2,h/2,(12-(degree/30)),this.font_style);
             // text.ScaleX+=1;
-            
+
             // Enable the spin button
             this.letter.setInteractive();
             this.standart.setInteractive();
             // this.wheel_container.angle=0;
             this.modalBackground.setVisible(true);
-            this.scaleTrigger=false;
-            this.letter.angle=0;
+            this.scaleTrigger = false;
+            this.letter.angle = 0;
             this.rotation.play();
         }
     });
 }
 
-function update(){
+function update() {
     console.log("Inside update");
+    //let s = Math.random();
+    emitter.forEachAlive(function (particle) {
+        particle.rotation += 0.6;
+        particle.alpha -= 0.01;
+    }, this);
 }
 function hideSuccessModal() {
     // this.modal.visible = false;
@@ -644,19 +676,8 @@ function hideSuccessModal() {
             emitter.stop();
             this.modalBackground.setVisible(false);
         },
-      });
-    
+    });
+
     this.rotation.play();
-    
+
 }
-// window.WebFont.load({
-//     custom: {
-//       families: ['Inter'],
-//       urls: ['assets/fonts/Inter/Inter-VariableFont_slnt,wght.ttf', ]
-//     }
-//   });
-// scene.load.scenePlugin({
-//     key: 'rexuiplugin',
-//     url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
-//     sceneKey: 'rexUI'
-// });
