@@ -102,32 +102,23 @@ let music;
 let backsound;
 let counter = 0;
 let pop;
-let rounds;
-let degree;
 let total;
 let tween;
-let title;
-let background;
-let totalScore_panel;
 let total_spin;
-let ellipse;
-let panel_container;
 let base;
-let wheel_container;
 let wheel;
 let lights;
 let letters;
 let coins;
-let try_luck;
-let letter;
 let pin;
 let spinwin;
-let standart;
 let emitter;
+let total_rect;
 
 function preload() {
     console.log("Preload");
     const images = [
+        'landing',
         'background',
         'luck',
         'pin',
@@ -185,50 +176,79 @@ function preload() {
         'luckybonusbtc',
         'luckybonusbnb',
         'glitter',
+        'list',
+        'shareText',
+        'f',
+        't',
+        'm',
+        'l',
+        'or',
+        'refer',
     ];
     images.forEach((image) => {
         this.load.image(image, `assets/img/${image}.png`);
     });
     this.load.spritesheet('particles', 'assets/img/flower.png', { frameWidth: 100, frameHeight: 100 });
-    this.load.spritesheet('lottery', 'assets/img/flower.png', { frameWidth: 100, frameHeight: 100 });
-    this.load.spritesheet("plane", "assets/img/plane.png", { frameWidth: 512, frameHeight: 512 });
     this.load.spritesheet("shiningStar", "assets/img/twinklingstar.png", { frameWidth: 738, frameHeight: 738 });
 
-    this.load.audio('buttonsound', ['assets/AudioClips/playStart.wav']);
+    this.load.audio('startsound', ['assets/AudioClips/playStart.wav']);
     this.load.audio('pop', ['assets/AudioClips/spinWin.wav']);
     this.load.audio('backsound', ['assets/AudioClips/03_Spinning_Wheel_Music_LOOP.wav']);
-    // WebFont.load({
-    //     google: {
-    //         families: ['Inter']
-    //     },
-    //     active: () => {
-    //         // Font is loaded and ready to use
-    //         aaa = this.add.text(100, 100, 'Hello Phaser', { fontFamily: 'Your Font Family', fontSize: '32px', color: '#ffffff' });
-    //         aaa.setDepth(10);
-    //     }
-    // });
-
+    this.load.audio('buttonsound', ['assets/AudioClips/uiButton.wav']);
 };
 
 function create() {
     console.log("Create");
-    const title = this.add.sprite(width / 2, 72, 'title');
-    const background = this.add.sprite(width / 2, 400, 'background');
-    background.setScale(1);
+    const landing = this.add.sprite(width / 2, height / 2, 'landing');
+    landing.setScale(1);
+    landing.setOrigin(0.5, 0.5);
 
-    // create a new rectangle shape with border-radius, stroke, and alpha
-    const total_rect = this.add.graphics();
-    total_rect.setPosition(width / 2 - 242, 188);
-    // total_rect.setOrigin(0.5);
-    total_rect.fillStyle('0x072537');
-    total_rect.fillRoundedRect(0, 0, 484, 70, 10);
+    this.standart = this.add.sprite(width / 2, 850, 'standart').setInteractive();
+    this.standart.setScale(1);
+    this.standart.on('pointerup', showSpinwheelModal, this);
+
+    // blur back of modal
+    this.modalBackground = this.add.sprite(0, -20, 'modalBackground');
+    this.modalBackground.setOrigin(0);
+    this.modalBackground.setAlpha(0.5);
+    this.modalBackground.setInteractive();
+    this.modalBackground.visible = false;
+
+    //set spinwheel modal
+    this.spinwheelmodal = this.add.container(width / 2, height / 2);
+    this.spinwheelmodal.setSize(476, 807);
+
+    const spinwheelmodal_rect = this.add.graphics();
+    spinwheelmodal_rect.fillStyle('0x072537');
+    spinwheelmodal_rect.fillRoundedRect(460 - width / 2, 60 - height / 2, 516, 870, 10);
+    const ellipse = this.add.sprite(0, 440 - height / 2, 'ellipse');
+    ellipse.setScale(1);
+    const title_text = this.add.text(0, 125 - height / 2, `SPIN THE WHEEL`, {
+        font: '32px DM Sans'
+    });
+    title_text.setStyle({
+        color: '#F5F5F5',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: '32px',
+        fontFamily: 'DM Sans',
+        bold: 'True',
+        lineHeight: '100%',
+        letterSpacing: '-1.28px',
+        align: 'right',
+        textTransform: 'uppercase',
+        fontStyle: 'normal',
+    });
+    title_text.setOrigin(0.5, 0.5);
+    total_rect = this.add.graphics();
+    total_rect.setPosition(490 - width / 2, 184 - height / 2);
+    total_rect.fillStyle('0x010E17');
+    total_rect.fillRoundedRect(0, 0, 452, 62, 10);
     this.add.existing(total_rect);
-    const totalScore_panel = this.add.container(width / 2, 225);
-    const total_spin = this.add.sprite(-190, 0, 'total_spin');
-    this.totalScore_text = this.add.text(230, 0, `$337,095,568.67`, {
+    total_spin = this.add.sprite(- 170, 215 - height / 2, 'total_spin');
+    this.totalScore_text = this.add.text(210, 215 - height / 2, `$337,095,568.67`, {
         font: 'bold 32px Inter'
     });
-    // this.load.font('Inter', 'assets/fonts/Inter/Inter-VariableFont_slnt,wght.ttf');
     this.totalScore_text.setStyle({
         color: '#0099F4',
         textAlign: 'center',
@@ -239,30 +259,86 @@ function create() {
         textTransform: 'uppercase'
     });
     this.totalScore_text.setOrigin(1, 0.5);
-    totalScore_panel.add(total_spin);
-    totalScore_panel.add(this.totalScore_text);
-
-    const ellipse = this.add.sprite(width / 2, 470, 'ellipse');
-    ellipse.setScale(1);
-
-    const panel_container = this.add.container(width / 2, height / 2);
-    panel_container.setSize(520, 525);
-
-    const base = this.add.sprite(0, -220, 'base');
+    this.spinwheelmodalclose = this.add.sprite(950 - width / 2, 90 - height / 2, 'close').setInteractive();
+    this.spinwheelmodalclose.setScale(0.2);
+    this.spinwheelmodalclose.on('pointerup', hideSpinWheelModal, this);
+    base = this.add.sprite(0, - 220, 'base');
     base.setScale(1);
-    panel_container.add(base);
-
-    this.wheel_container = this.add.container(width / 2, 462);
-    const wheel = this.add.sprite(0, 0, 'wheel');
+    this.wheel_container = this.add.container(0, 462 - height / 2);
+    wheel = this.add.sprite(0, 0, 'wheel');
     wheel.setDisplaySize(470, 470);
-    const lights = this.add.sprite(0, 0, 'lights');
-    const letters = this.add.sprite(0, 0, 'letters');
-    const coins = this.add.sprite(0, 0, 'coins');
+    lights = this.add.sprite(0, 0, 'lights');
+    letters = this.add.sprite(0, 0, 'letters');
+    coins = this.add.sprite(0, 0, 'coins');
     this.wheel_container.add(wheel);
     this.wheel_container.add(lights);
     this.wheel_container.add(letters);
     this.wheel_container.add(coins);
+    this.try_luck = this.add.image(0, 460 - height / 2, 'button');
+    this.try_luck.setScale(1);
+    this.letter = this.add.sprite(0, 460 - height / 2, 'luck').setInteractive();
+    this.letter.setScale(1);
+    this.letter.setOrigin(0.5, 0.5);
+    pin = this.add.sprite(0, 304 - height / 2, 'pin');
+    pin.setScale(1);
+    spinwin = this.add.sprite(0, 700 - height / 2, 'spinwin');
+    spinwin.setScale(1);
+    const shineRound = this.add.sprite(- 150, 700 - height / 2, 'shineRound');
+    shineRound.setScale(1);
+    const shineRound1 = this.add.sprite(0, 700 - height / 2, 'shineRound');
+    shineRound1.setScale(1);
+    shineRound.alpha = 0;
+    shineRound1.alpha = 1;
+    const luckyspin_rect = this.add.graphics();
+    luckyspin_rect.setPosition(- 90, 760 - height / 2);
+    luckyspin_rect.fillStyle('0x010E17');
+    luckyspin_rect.fillRoundedRect(0, 0, 180, 50, 0);
+    const luckyspin_text = this.add.text(0, 785 - height / 2, `LCUKY SPIN: 1`, {
+        font: '16px Inter bold'
+    });
+    luckyspin_text.setStyle({
+        fontSize: '16px',
+        fontFamily: 'Inter',
+        color: '#F5F5F5',
+        textAlign: 'center',
+        bold: 'True',
+        lineHeight: '100%',
+        letterSpacing: '-1.28px',
+        align: 'right',
+        textTransform: 'uppercase',
+        fontStyle: 'normal',
+    });
+    luckyspin_text.setOrigin(0.5, 0.5);
+    const line = new Phaser.Geom.Line(- 226, 830 - height / 2, 226, 830 - height / 2);
+    const line_graphics = this.add.graphics();
+    line_graphics.lineStyle(1, 0x293C53);
+    line_graphics.strokeLineShape(line);
+    const list = this.add.sprite(0, 880 - height / 2, 'list');
+    //add to spinwheelmodal
+    this.spinwheelmodal.add(spinwheelmodal_rect);
+    this.spinwheelmodal.add(ellipse);
+    this.spinwheelmodal.add(title_text);
+    this.spinwheelmodal.add(this.spinwheelmodalclose);
+    this.spinwheelmodal.add(total_rect);
+    this.spinwheelmodal.add(total_spin);
+    this.spinwheelmodal.add(this.totalScore_text);
+    this.spinwheelmodal.add(base);
+    this.spinwheelmodal.add(this.wheel_container);
+    this.spinwheelmodal.add(this.try_luck);
+    this.spinwheelmodal.add(this.letter);
+    this.spinwheelmodal.add(pin);
+    this.spinwheelmodal.add(spinwin);
+    this.spinwheelmodal.add(luckyspin_rect);
+    this.spinwheelmodal.add(luckyspin_text);
+    this.spinwheelmodal.add(line_graphics);
+    this.spinwheelmodal.add(list);
+    this.spinwheelmodal.add(shineRound);
+    this.spinwheelmodal.add(shineRound1);
+    this.spinwheelmodal.setScale(0.3);
+    this.spinwheelmodal.visible = false;
 
+    //animation
+    //change of lights's alpha 
     lights.alpha = 0.2;
     this.tweens.add({
         targets: lights,
@@ -272,31 +348,10 @@ function create() {
         yoyo: true, // Play the animation in reverse after reaching the target alpha
         repeat: -1, // Repeat the animation indefinitely
     });
-
-    this.try_luck = this.add.image(width / 2, 460, 'button');
-    this.try_luck.setScale(1);
-    // this.try_luck.setDepth(10);
-    this.letter = this.add.sprite(width / 2, 460, 'luck').setInteractive();
-    this.letter.setScale(1);
-    this.letter.setOrigin(0.5, 0.5);
-    // this.letter.setDepth(1);
-    const pin = this.add.sprite(width / 2, 304, 'pin');
-    pin.setScale(1);
-
-    const spinwin = this.add.sprite(width / 2, 700, 'spinwin');
-    spinwin.setScale(1);
-
-    const shineRound = this.add.sprite(width / 2 - 150, 700, 'shineRound');
-    shineRound.setScale(1);
-
-    const shineRound1 = this.add.sprite(width / 2, 700, 'shineRound');
-    shineRound1.setScale(1);
-
-    shineRound.alpha = 0;
-    shineRound1.alpha = 1;
-    this.half1 = this.tweens.add({
+    //flow shine area
+    const half1 = this.tweens.add({
         targets: shineRound1,
-        x: width / 2 + 150, // End position off-screen to the right
+        x: 150, // End position off-screen to the right
         alpha: 0,
         duration: 4000, // Duration of the animation in milliseconds
         ease: 'Quadratic.InOut', // Easing function
@@ -304,24 +359,18 @@ function create() {
         //yoyo: true,
         // delay: 2000,
     });
-    // this.half1.stop();
-    this.flowTrigger = false;
     const half = this.tweens.add({
         targets: shineRound,
-        x: width / 2, // End position off-screen to the right
+        x: 0, // End position off-screen to the right
         alpha: 1,
         duration: 4000, // Duration of the animation in milliseconds
         ease: 'Quadratic.InOut', // Easing function
         repeat: -1, // Repeat the animation indefinitely
         //yoyo: true,
     });
-
-    this.standart = this.add.sprite(width / 2, 790, 'standart').setInteractive();
-    this.standart.setScale(1);
-
     this.scaleTrigger = false;
     this.letter.on('pointerup', spinwheel, this);
-    this.standart.on('pointerup', spinwheel, this);
+    //scaling letter
     this.letter.on('pointerover', function (pointer, localX, localY, event) {
         // Start the scaling animation when the mouse enters the canvas
         this.tweens.add({
@@ -332,7 +381,6 @@ function create() {
             ease: 'Linear',
         });
     }, this);
-
     this.letter.on('pointerout', function () {
         // Reverse the scaling animation when the mouse leaves the canvas
         if (this.scaleTrigger) {
@@ -348,7 +396,7 @@ function create() {
             });
         }
     }, this);
-
+    // rotate letter(try luck)
     this.rotation = this.tweens.add({
         targets: this.letter,
         angle: -20, // The final angle of rotation (in degrees)
@@ -358,113 +406,14 @@ function create() {
         yoyo: true // Set to true to make the animation reverse back to its initial state
     });
 
-    // this.rotation.play();
-    //
-    //set footer
-    const game_icon = this.add.sprite(350, 920, 'game');
-    this.game_text = this.add.text(400, 920, `More than 5000+ online slot games`, {
-        wordWrap: { width: 150, useAdvancedWrap: true },
-        font: 'DM Sans'
-    });
-    this.game_text.setStyle({
-        color: '#E6E6E6',
-        fontSize: '16px',
-        fontFamily: 'DM Sans',
-        fontWeight: '500',
-        lineHeight: '140%',
-        align: 'left'
-    });
-    this.game_text.setOrigin(0, 0.5);
-
-    const betting_icon = this.add.sprite(620, 920, 'betting');
-    this.betting_text = this.add.text(670, 920, `Seamless sports betting experience`, {
-        wordWrap: { width: 150, useAdvancedWrap: true },
-        font: 'DM Sans'
-    });
-    this.betting_text.setStyle({
-        color: '#E6E6E6',
-        fontSize: '16px',
-        fontFamily: 'DM Sans',
-        fontWeight: '500',
-        lineHeight: '140%',
-        align: 'left'
-    });
-    this.betting_text.setOrigin(0, 0.5);
-    const customer_icon = this.add.sprite(890, 920, 'customer');
-    this.customer_text = this.add.text(940, 920, `24/7 live chat for customer support`, {
-        wordWrap: { width: 150, useAdvancedWrap: true },
-        font: 'DM Sans'
-    });
-    this.customer_text.setStyle({
-        color: '#E6E6E6',
-        fontSize: '16px',
-        fontFamily: 'DM Sans',
-        fontWeight: '500',
-        lineHeight: '140%',
-        align: 'left'
-    });
-    this.customer_text.setOrigin(0, 0.5);
-
-    const bottom_rect = this.add.graphics();
-    bottom_rect.setPosition(width / 2 - 400, 1040);
-    // bottom_rect.setOrigin(0.5);
-    bottom_rect.fillStyle('0x072537');
-    bottom_rect.fillRoundedRect(0, 0, 800, 205, 10);
-    this.add.existing(bottom_rect);
-    this.bottomTitle_text = this.add.text(width / 2, 1087, `Our Payment`, {
-        // wordWrap: { width: 150, useAdvancedWrap: true },
-        font: 'DM Sans'
-    });
-    this.bottomTitle_text.setStyle({
-        color: '#E6E6E6',
-        fontSize: '32px',
-        fontFamily: 'DM Sans',
-        fontWeight: '700',
-        lineHeight: '100%',
-        align: 'center',
-    });
-    this.bottomTitle_text.setOrigin(0.5, 0.5);
-    this.bottomExp_text = this.add.text(width / 2, 1120, `Purchase crypto with our accepted payment methods`, {
-        // wordWrap: { width: 150, useAdvancedWrap: true },
-        font: 'DM Sans'
-    });
-    this.bottomExp_text.setStyle({
-        color: '#E6E6E6',
-        fontSize: '14px',
-        fontFamily: 'DM Sans',
-        fontWeight: '500',
-        lineHeight: '150%',
-        align: 'center',
-        letterSpacing: '-0.42px'
-    });
-    this.bottomExp_text.setOrigin(0.5, 0.5);
-
-    this.tm_icon = this.add.sprite(380, 1180, 'tm_icon');
-    this.tm_icon.setOrigin(0.5, 0.5);
-    this.visa_icon = this.add.sprite(width / 2 - 160, 1180, 'visa_icon');
-    this.visa_icon.setOrigin(0.5, 0.5);
-    this.apple_icon = this.add.sprite(width / 2, 1180, 'apple_icon');
-    this.apple_icon.setOrigin(0.5, 0.5);
-    this.google_icon = this.add.sprite(width / 2 + 160, 1180, 'google_icon');
-    this.google_icon.setOrigin(0.5, 0.5);
-    this.samsung_icon = this.add.sprite(1040, 1180, 'samsung_icon');
-    this.samsung_icon.setOrigin(0.5, 0.5);
-
-    this.modalBackground = this.add.sprite(0, -20, 'modalBackground');
-    this.modalBackground.setOrigin(0);
-    this.modalBackground.setAlpha(0.5);
-    this.modalBackground.setInteractive();
-
-    this.modalBackground.visible = false;
-
-    //set modal
+    //set congratulation modal
     this.modal = this.add.container(width / 2, height / 2 - 300);
     this.modal.setSize(617, 516);
 
     const modal_rect = this.add.graphics();
     // modal_rect.setPosition(width/2-320, 30);
     modal_rect.fillStyle('0x072537');
-    modal_rect.fillRoundedRect(-320, -380, 640, 520, 10);
+    modal_rect.fillRoundedRect(-320, -380, 640, 750, 10);
     // this.add.existing(modal_rect);
 
     const ellipse_modal = this.add.sprite(0, -80, 'ellipse_modal');
@@ -484,15 +433,49 @@ function create() {
     this.cong_text = this.add.text(0, -340, "");
     this.cong_text.setStyle({
         fontSize: '32px',
-        fontFamily: 'Gilroy',
+        fontFamily: 'Inter',
         color: '#F5F5F5',
         fontWeight: '600',
         lineHeight: '100%',
         letterSpacing: '-1.28px',
         align: 'center'
     });
-
     this.cong_text.setOrigin(0.5, 0);
+    const line2 = new Phaser.Geom.Line(- 260, 840 - height / 2, 260, 840 - height / 2);
+    const line_graphics2 = this.add.graphics();
+    line_graphics2.lineStyle(1, 0x293C53);
+    line_graphics2.strokeLineShape(line2);
+    const share_text = this.add.sprite(0, 150, 'shareText');
+    share_text.setScale(0.27)
+    const f_icon = this.add.sprite(-120, 200, 'f');
+    f_icon.setDisplaySize(50, 50);
+    const t_icon = this.add.sprite(-40, 200, 't');
+    t_icon.setDisplaySize(50, 50);
+    const m_icon = this.add.sprite(40, 200, 'm');
+    m_icon.setDisplaySize(50, 50);
+    const l_icon = this.add.sprite(120, 200, 'l');
+    l_icon.setDisplaySize(50, 50);
+    const or_text = this.add.sprite(0, 250, 'or');
+    or_text.setScale(0.27);
+    const refer_text = this.add.sprite(0, 280, 'refer');
+    refer_text.setScale(0.27);
+    const link_text = this.add.text(0, 320, `Refer a friend now`, {
+        font: '20px DM Sans'
+    });
+    link_text.setStyle({
+        color: '#00A0FF',
+        textAlign: 'center',
+        fontWeight: '500',
+        fontSize: '20px',
+        fontFamily: 'DM Sans',
+        bold: 'True',
+        lineHeight: '150%',
+        letterSpacing: '-0.8px',
+        align: 'right',
+        textTransform: 'uppercase',
+        fontStyle: 'normal',
+    });
+    link_text.setOrigin(0.5, 0.5);
     this.close.on('pointerup', hideSuccessModal, this);
     this.signup.on('pointerup', hideSuccessModal, this);
 
@@ -504,7 +487,15 @@ function create() {
     this.modal.add(this.close);
     this.modal.add(this.cong_text);
     this.modal.add(this.signup);
-    // Phaser.Display.Align.In.Center(this.modal, this.add.zone(0, 0, game.config.width, game.config.height));
+    this.modal.add(line_graphics2);
+    this.modal.add(share_text);
+    this.modal.add(f_icon);
+    this.modal.add(t_icon);
+    this.modal.add(m_icon);
+    this.modal.add(l_icon);
+    this.modal.add(or_text);
+    this.modal.add(refer_text);
+    this.modal.add(link_text);
     this.modal.setScale(0.3);
     this.modal.visible = false;
 
@@ -538,37 +529,6 @@ function create() {
         frames: this.anims.generateFrameNumbers("shiningStar", { start: 0, end: 2 }),
         repeat: 2
     });
-    // plane = this.add.sprite(640, 360, "shiningStar");
-    // plane.play("shine");
-    // glitter = this.add.sprite(200, 200, 'glitter');
-    // this.tweens.add({
-    //     targets: shineRound1,
-    //     x: width / 2 + 150, // End position off-screen to the right
-    //     alpha: 0,
-    //     duration: 4000, // Duration of the animation in milliseconds
-    //     ease: 'Quadratic.InOut', // Easing function
-    //     repeat: -1, // Repeat the animation indefinitely
-    //     //yoyo: true,
-    //     // delay: 2000,
-    // });
-    /*emitter = this.add.particles('glitter').createEmitter({
-        x: (100, 200),
-        y: (100, 200),
-        // key: 'particleKey', // key to use when creating the particle emitter
-        // frame: { frames: [0, 1, 2, 3], cycle: true }, // frames to use for the particles
-        lifespan: 2000, // lifespan of the particles in milliseconds
-        speed: { min: 0, max: 0 },
-        angle: { min: 0, max: 360 },
-        scale: { start: 0.2, end: 0.3 },
-        // gravityY: 0, // gravity applied to the particles
-        // quantity: 10, // number of particles emitted per second
-        // frequency: 100, // time between particle emissions in milliseconds
-        alpha: { start: 0, end: 1 }, // alpha of the particles over their lifespan
-        blendMode: 'NORMAL', // blending mode of the particles
-        tint: 0xffffff // tint color of the particles
-    });*/
-    //emitter.area = new Rectangle(200, 200, 300, 300);
-    //emitter.start(false, 100, 100);
 
     console.log(Phaser.VERSION);
     // Create a particle emitter manager
@@ -579,20 +539,17 @@ function create() {
     music = this.sound.add('buttonsound');
     pop = this.sound.add('pop');
     backsound = this.sound.add('backsound');
+    startsound = this.sound.add('startsound');
     backsound.autoPlay = true;
     backsound.play();
-
 }
 let showValue;
 let board;
 function spinwheel() {
     // Disable the spin button
     this.letter.disableInteractive();
-    this.standart.disableInteractive();
-
     this.scaleTrigger = true;
     this.rotation.stop();
-
     music.play();
     let rounds = Phaser.Math.Between(3, 5);
     let rand = Math.random();
@@ -615,15 +572,6 @@ function spinwheel() {
         duration: 6000,
         callbackScope: this,
         onComplete: function () {
-            this.modal.visible = true;
-            this.tweens.add({
-                targets: this.modal,
-                scaleX: 1,
-                scaleY: 1,
-                ease: 'Back',
-                duration: 200,
-            });
-
             this.cong_text.setText(arr_cong[index].text);
             showValue = this.add.sprite(0, -20, `${arr_cong[index].icon}`);
             board = this.add.sprite(0, -170, `${arr_cong[index].board}`);
@@ -631,24 +579,37 @@ function spinwheel() {
             // board.setScale(0.25);
             this.modal.add(showValue);
             this.modal.add(board);
-            emitter.explode(100);
             console.log(arr[index], index);
             counter = counter + arr[index];
             music.stop();
             pop.play();
-            // this.game_text.setText("You won "+(9-(degree/40)));
-            // this.totalScore_text.setText('$'+ counter);
-            // this.add.text(w/2,h/2,(12-(degree/30)),this.font_style);
-            // text.ScaleX+=1;
-
             // Enable the spin button
             this.letter.setInteractive();
-            this.standart.setInteractive();
-            // this.wheel_container.angle=0;
+            this.tweens.add({
+                targets: this.spinwheelmodal,
+                scaleX: 0,
+                scaleY: 0,
+                ease: 'Back',
+                duration: 200,
+                onComplete: () => {
+                    this.spinwheelmodal.setVisible(false);
+                    this.modal.visible = true;
+                    emitter.explode(100);
+                    this.tweens.add({
+                        targets: this.modal,
+                        scaleX: 1,
+                        scaleY: 1,
+                        ease: 'Back',
+                        duration: 200,
+                        onComplete: ()=>{
+                            this.letter.angle = 0;
+                            this.rotation.play();
+                        }
+                    });
+                },
+            });
             this.modalBackground.setVisible(true);
             this.scaleTrigger = false;
-            this.letter.angle = 0;
-            this.rotation.play();
         }
     });
 }
@@ -662,7 +623,6 @@ function update() {
     }, this);
 }
 function hideSuccessModal() {
-    // this.modal.visible = false;
     this.tweens.add({
         targets: this.modal,
         scaleX: 0.8,
@@ -677,7 +637,33 @@ function hideSuccessModal() {
             this.modalBackground.setVisible(false);
         },
     });
-
     this.rotation.play();
+}
+function showSpinwheelModal() {
+    this.spinwheelmodal.setVisible(true);
+    // Enable the spin button
+    this.letter.setInteractive();
+    // this.wheel_container.angle=0;
+    this.modalBackground.setVisible(true);
+    this.tweens.add({
+        targets: this.spinwheelmodal,
+        scaleX: 1,
+        scaleY: 1,
+        ease: 'Back',
+        duration: 200,
+    });
+}
 
+function hideSpinWheelModal() {
+    this.tweens.add({
+        targets: this.spinwheelmodal,
+        scaleX: 0.8,
+        scaleY: 0.8,
+        ease: 'Back',
+        duration: 100,
+        onComplete: () => {
+            this.spinwheelmodal.setVisible(false);
+            this.modalBackground.setVisible(false);
+        },
+    });
 }
