@@ -582,17 +582,18 @@ function spinwheel() {
             this.modal.add(board);
             console.log(arr[index], index);
             counter = counter + arr[index];
-            music.stop();
-            pop.play();
+            // music.stop();
             // Enable the spin button
             this.letter.setInteractive();
             this.tweens.add({
+                delay: 500,
                 targets: this.spinwheelmodal,
                 scaleX: 0,
                 scaleY: 0,
                 ease: 'Back',
                 duration: 200,
                 onComplete: () => {
+                    pop.play();
                     this.spinwheelmodal.setVisible(false);
                     this.modal.visible = true;
                     emitter.explode(100);
