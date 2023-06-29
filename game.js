@@ -541,7 +541,7 @@ function create() {
     backsound = this.sound.add('backsound');
     startsound = this.sound.add('startsound');
     backsound.autoPlay = true;
-    backsound.play();
+    backsound.play({ loop: true });
 }
 let showValue;
 let board;
@@ -572,6 +572,7 @@ function spinwheel() {
         duration: 6000,
         callbackScope: this,
         onComplete: function () {
+            startsound.play();
             this.cong_text.setText(arr_cong[index].text);
             showValue = this.add.sprite(0, -20, `${arr_cong[index].icon}`);
             board = this.add.sprite(0, -170, `${arr_cong[index].board}`);
@@ -601,7 +602,7 @@ function spinwheel() {
                         scaleY: 1,
                         ease: 'Back',
                         duration: 200,
-                        onComplete: ()=>{
+                        onComplete: () => {
                             this.letter.angle = 0;
                             this.rotation.play();
                         }
@@ -640,6 +641,7 @@ function hideSuccessModal() {
     this.rotation.play();
 }
 function showSpinwheelModal() {
+    startsound.play();
     this.spinwheelmodal.setVisible(true);
     // Enable the spin button
     this.letter.setInteractive();
