@@ -73,7 +73,8 @@ let config = {
     parent: 'game-container',
     width: GAME_WIDTH,
     height: GAME_WIDTH,
-    backgroundColor: 0x04141E,
+    transparent: true,
+    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
 
     scale: {
         mode: Phaser.Scale.FIT,
@@ -127,6 +128,7 @@ function preload() {
         'spinwin',
         'base',
         'wheel',
+        'wheel1',
         'lights',
         'letters',
         'coins',
@@ -199,23 +201,23 @@ function preload() {
 
 function create() {
     console.log("Create");
-    const landing = this.add.sprite(width / 2, height / 2, 'landing');
-    landing.setScale(1);
-    landing.setOrigin(0.5, 0.5);
+    // const landing = this.add.sprite(width / 2, height / 2, 'landing');
+    // landing.setScale(1);
+    // landing.setOrigin(0.5, 0.5);
 
-    this.standart = this.add.sprite(width / 2, 850, 'standart').setInteractive();
-    this.standart.setScale(1);
+    this.standart = this.add.sprite(width / 2, 750, 'wheel1').setInteractive();
+    this.standart.setScale(0.5);
     this.standart.on('pointerup', showSpinwheelModal, this);
 
     // blur back of modal
-    this.modalBackground = this.add.sprite(0, -20, 'modalBackground');
-    this.modalBackground.setOrigin(0);
-    this.modalBackground.setAlpha(0.5);
-    this.modalBackground.setInteractive();
-    this.modalBackground.visible = false;
+    // this.modalBackground = this.add.sprite(0, -20, 'modalBackground');
+    // this.modalBackground.setOrigin(0);
+    // this.modalBackground.setAlpha(0.5);
+    // this.modalBackground.setInteractive();
+    // this.modalBackground.visible = false;
 
     //set spinwheel modal
-    this.spinwheelmodal = this.add.container(width / 2, height / 2);
+    this.spinwheelmodal = this.add.container(width / 2, height / 2+200);
     this.spinwheelmodal.setSize(476, 807);
 
     const spinwheelmodal_rect = this.add.graphics();
@@ -293,7 +295,7 @@ function create() {
     luckyspin_rect.setPosition(- 90, 760 - height / 2);
     luckyspin_rect.fillStyle('0x010E17');
     luckyspin_rect.fillRoundedRect(0, 0, 180, 50, 0);
-    const luckyspin_text = this.add.text(0, 785 - height / 2, `LCUKY SPIN: 1`, {
+    const luckyspin_text = this.add.text(0, 785 - height / 2, `LUCKY SPIN: 1`, {
         font: '16px Inter bold'
     });
     luckyspin_text.setStyle({
@@ -334,7 +336,7 @@ function create() {
     this.spinwheelmodal.add(list);
     this.spinwheelmodal.add(shineRound);
     this.spinwheelmodal.add(shineRound1);
-    this.spinwheelmodal.setScale(0.3);
+    this.spinwheelmodal.setScale(0);
     this.spinwheelmodal.visible = false;
 
     //animation
@@ -407,7 +409,7 @@ function create() {
     });
 
     //set congratulation modal
-    this.modal = this.add.container(width / 2, height / 2 - 300);
+    this.modal = this.add.container(width / 2, height / 2);
     this.modal.setSize(617, 516);
 
     const modal_rect = this.add.graphics();
@@ -496,12 +498,12 @@ function create() {
     this.modal.add(or_text);
     this.modal.add(refer_text);
     this.modal.add(link_text);
-    this.modal.setScale(0.3);
+    this.modal.setScale(0);
     this.modal.visible = false;
 
     let particleConfig = {
         x: width / 2,
-        y: 300,
+        y: 500,
         key: 'particleKey', // key to use when creating the particle emitter
         frame: { frames: [0, 1, 2, 3], cycle: true }, // frames to use for the particles
         lifespan: 2000, // lifespan of the particles in milliseconds
@@ -515,20 +517,6 @@ function create() {
         blendMode: 'NORMAL', // blending mode of the particles
         tint: 0xffffff // tint color of the particles
     };
-
-    this.anims.create({
-        key: "shine",
-        frameRate: 200,
-        frames: this.anims.generateFrameNumbers("shiningStar", { start: 0, end: 9 }),
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: "explode",
-        frameRate: 7,
-        frames: this.anims.generateFrameNumbers("shiningStar", { start: 0, end: 2 }),
-        repeat: 2
-    });
 
     console.log(Phaser.VERSION);
     // Create a particle emitter manager
@@ -610,7 +598,7 @@ function spinwheel() {
                     });
                 },
             });
-            this.modalBackground.setVisible(true);
+            // this.modalBackground.setVisible(true);
             this.scaleTrigger = false;
         }
     });
@@ -627,8 +615,8 @@ function update() {
 function hideSuccessModal() {
     this.tweens.add({
         targets: this.modal,
-        scaleX: 0.8,
-        scaleY: 0.8,
+        scaleX: 0,
+        scaleY: 0,
         ease: 'Back',
         duration: 100,
         onComplete: () => {
@@ -636,7 +624,7 @@ function hideSuccessModal() {
             showValue.destroy();
             board.destroy();
             emitter.stop();
-            this.modalBackground.setVisible(false);
+            // this.modalBackground.setVisible(false);
         },
     });
     this.rotation.play();
@@ -647,7 +635,7 @@ function showSpinwheelModal() {
     // Enable the spin button
     this.letter.setInteractive();
     // this.wheel_container.angle=0;
-    this.modalBackground.setVisible(true);
+    // this.modalBackground.setVisible(true);
     this.tweens.add({
         targets: this.spinwheelmodal,
         scaleX: 1,
@@ -660,13 +648,13 @@ function showSpinwheelModal() {
 function hideSpinWheelModal() {
     this.tweens.add({
         targets: this.spinwheelmodal,
-        scaleX: 0.8,
-        scaleY: 0.8,
+        scaleX: 0,
+        scaleY: 0,
         ease: 'Back',
         duration: 100,
         onComplete: () => {
             this.spinwheelmodal.setVisible(false);
-            this.modalBackground.setVisible(false);
+            // this.modalBackground.setVisible(false);
         },
     });
 }
